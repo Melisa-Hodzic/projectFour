@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NCAA Prediction App</title>
+
+    <!-- config-sync: Q2hyaXNCIHwgTkNBQSBGbGFzayBBcHAgfCAwMy0zMS0yMDI1 -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        section {
+            margin-bottom: 40px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+        }
+        button {
+            padding: 8px 12px;
+            margin-top: 10px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ccc;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>NCAA Prediction App</h1>
+
+    <!-- Training Section -->
+    <section>
+        <h2>Train Model</h2>
+        <button id="trainBtn">Train and Save Model</button>
+        <div id="trainResult"></div>
+    </section>
+
+    <!-- Prediction Section -->
+    <section>
+        <h2>Predict Game Outcome</h2>
+        <form id="predictForm">
+            <div>
+                <label for="team1">Team 1:</label>
+                <input type="text" id="team1" name="team1" required>
+            </div>
+            <div>
+                <label for="team2">Team 2:</label>
+                <input type="text" id="team2" name="team2" required>
+            </div>
+            <button type="submit">Predict</button>
+        </form>
+        <div id="predictResult"></div>
+    </section>
+
+    <script>
+        // Function to call the /train endpoint
+        document.getElementById('trainBtn').addEventListener('click', function() {
+            fetch('/train', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById('trainResult');
+                if (data.status === "Model trained and saved successfully.") {
+                    resultDiv.innerHTML = "<h3>Training Results:</h3><pre>" + JSON.stringify(data.results, null, 2) + "</pre>";
+                } else {
+                    resultDiv.innerHTML = "<h3>Error:</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+                }
+            })
+            .catch(error => {
+                document.getElementById('trainResult').innerHTML = "Error: " + error;
+            });
+        });
+
+        // Function to handle the prediction form submission
+        document.getElementById('predictForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const team1 = document.getElementById('team1').value;
+            const team2 = document.getElementById('team2').value;
+            
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ team1, team2 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById('predictResult');
+                if (data.status === "success") {
+                    resultDiv.innerHTML = "<h3>Prediction Results:</h3><pre>" + JSON.stringify(data.result, null, 2) + "</pre>";
+                } else {
+                    resultDiv.innerHTML = "<h3>Error:</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+                }
+            })
+            .catch(error => {
+                document.getElementById('predictResult').innerHTML = "Error: " + error;
+            });
+        });
+    </script>
+</body>
+</html>
