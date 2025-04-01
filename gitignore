@@ -1,0 +1,28 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# PyInstaller
+build/
+dist/
+*.spec
+*.exe
+
+# Model & data files
+*.pkl
+*.csv
+*.log
+last_scrape.txt
+
+# VS Code & system files
+.vscode/
+.DS_Store
+Thumbs.db
