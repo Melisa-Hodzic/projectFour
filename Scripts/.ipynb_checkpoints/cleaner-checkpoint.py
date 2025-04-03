@@ -10,7 +10,7 @@ _normalized_defaults = [
 
 # Load the CSV files
 advanced = pd.read_csv(r"..\Data\04012025advanced_game_logs.csv")
-basic = pd.read_csv(r"..\Data\04012025gamelogs.csv")
+basic = pd.read_csv(r"..\Data\\04012025gamelogs.csv")
 
 
 # Print column names to inspect them
@@ -52,4 +52,4 @@ print(merged.head())
 
 print(merged.shape)
 
-merged.to_csv("../Data/merged_gamelogs.csv", index = False)
+merged.to_csv("..Data/merged_gamelogs.csv", index = False)
