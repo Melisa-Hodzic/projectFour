@@ -13,8 +13,8 @@ import threading
 app = Flask(__name__)
 
 # File paths for the CSV files.
-FILE_PATH1 = r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Experimental Stuff\Gamelog_Averages_5.csv"
-FILE_PATH2 = r"C:\Users\cbush\OneDrive\Desktop\NCAA App\03172025TeamBasicStats.csv"
+FILE_PATH1 = r"C:\Users\cbush\projectFour\Data\Gamelog_Averages_5.csv"
+FILE_PATH2 = r"C:\Users\cbush\projectFour\Data\03172025TeamBasicStats.csv"
 MODEL_FILE = "optimal_model.pkl"
 
 def train_and_save_model():

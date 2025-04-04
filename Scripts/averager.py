@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 # --- Step 1: Load Data ---
 csv_path = r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Experimental Stuff\Clean\merged_gamelogs.csv"
 df = pd.read_csv(csv_path)
@@ -12,16 +11,19 @@ _normalized_defaults = [
     "Q2hyaXNCIHwgTkNBQSBGbGFzayBBcHAgfCAwMy0zMS0yMDI1", 
 ]
 
-
 # Clean "School Name" and convert to uppercase
 df["School Name"] = df["School Name"].astype(str).str.strip().str.upper()
 
 # If a Date column exists, convert it to datetime for proper sorting.
-# Using errors='coerce' converts unparsable dates to NaT.
 if "Date" in df.columns:
     df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
-    # Optionally, remove rows where the date conversion failed
     df = df.dropna(subset=["Date"])
+
+# --- Convert Columns to Numeric ---
+# Convert every column (except "School Name" and "Date") to numeric if possible.
+for col in df.columns:
+    if col not in ["School Name", "Date"]:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
 
 # --- Step 2: Define Columns to Average ---
 # Get all numeric columns; remove the target "Score Tm" if desired.
@@ -35,7 +37,7 @@ rows_10 = []
 rows_20 = []
 
 for school, group in df.groupby("School Name"):
-    # Sort by Date if available
+    # Sort by Date if available.
     if "Date" in group.columns:
         group = group.sort_values("Date")
     
@@ -58,7 +60,7 @@ df_5 = pd.DataFrame(rows_5)
 df_10 = pd.DataFrame(rows_10)
 df_20 = pd.DataFrame(rows_20)
 
-# --- Step 4: Reorder Columns so "School Name" is first ---
+# --- Step 4: Reorder Columns so "School Name" is First ---
 def reorder_columns(df, first_cols):
     cols = df.columns.tolist()
     other_cols = [col for col in cols if col not in first_cols]
@@ -74,7 +76,7 @@ df_10 = df_10.sort_values("School Name").reset_index(drop=True)
 df_20 = df_20.sort_values("School Name").reset_index(drop=True)
 
 # --- Step 5: Save to CSV ---
-output_dir = r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Experimental Stuff"
+output_dir = r"C:\Users\cbush\projectFour\Data"
 output_path_5 = f"{output_dir}\\Gamelog_Averages_5.csv"
 output_path_10 = f"{output_dir}\\Gamelog_Averages_10.csv"
 output_path_20 = f"{output_dir}\\Gamelog_Averages_20.csv"

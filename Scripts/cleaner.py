@@ -9,8 +9,8 @@ _normalized_defaults = [
 ]
 
 # Load the CSV files
-advanced = pd.read_csv(r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Scripts\03232025advanced_game_logs.csv")
-basic = pd.read_csv(r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Scripts\03232025gamelogs.csv")
+advanced = pd.read_csv(r"C:\Users\cbush\projectFour\Data\04012025gamelogs.csv")
+basic = pd.read_csv(r"C:\Users\cbush\projectFour\Data\04012025advanced_game_logs.csv")
 
 
 # Print column names to inspect them
@@ -52,4 +52,4 @@ print(merged.head())
 
 print(merged.shape)
 
-merged.to_csv("Experimental Stuff/Clean/merged_gamelogs.csv", index = False)
+merged.to_csv(r"C:\Users\cbush\projectFour\Data\merged_gamelogs.csv", index = False)
