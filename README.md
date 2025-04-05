@@ -17,27 +17,6 @@ Our objective is to use NCAA men's basketball performance statistics to predict 
   -Created models of the data in order to predict outcomes of matchup betweens schools within the NCAA.
   
   -Create a flask application to allow easy user interface
-  
- **Our file struture**
+
  
-   Our repo has several folders.
-   
-     -Scripts
-     
-       *This file contains the files that scrape, clean and average the data from the URL(scraper.py, cleaner.py, averager.py).
-       
-       *This file also contains the Google Colab (Team4Project4MLModels_Master.ipynb) file that was used to perform initial data analysis and visualizations.
-       
-     -Data
-     
-       *This file contains outputs of the files in the Scripts folder
-       
-     -NCAAWebApp
-     
-       *This data contains the files that generate the model and the flask interface
-       
-   **Our Predictions**
-       
-
-     
-
+ 
