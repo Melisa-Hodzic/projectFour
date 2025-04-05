@@ -21,6 +21,7 @@ Our objective is to use NCAA men's basketball performance statistics to predict 
  **Our file struture**
  
    Our repo has several folders.
+   
      -Scripts
      
        *This file contains the files that scrape, clean and average the data from the URL(scraper.py, cleaner.py, averager.py).
