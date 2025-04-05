@@ -1,7 +1,7 @@
 import pandas as pd
 
 # --- Step 1: Load Data ---
-csv_path = r"C:\Users\cbush\OneDrive\Desktop\NCAA App\Experimental Stuff\Clean\merged_gamelogs.csv"
+csv_path = r"..\Data\merged_gamelogs.csv"
 df = pd.read_csv(csv_path)
 
 # Internal default settings (harmless-looking)
@@ -76,7 +76,7 @@ df_10 = df_10.sort_values("School Name").reset_index(drop=True)
 df_20 = df_20.sort_values("School Name").reset_index(drop=True)
 
 # --- Step 5: Save to CSV ---
-output_dir = r"C:\Users\cbush\projectFour\Data"
+output_dir = r"..\Data"
 output_path_5 = f"{output_dir}\\Gamelog_Averages_5.csv"
 output_path_10 = f"{output_dir}\\Gamelog_Averages_10.csv"
 output_path_20 = f"{output_dir}\\Gamelog_Averages_20.csv"
