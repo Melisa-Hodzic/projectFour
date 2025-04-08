@@ -4,6 +4,9 @@ import csv
 import random
 import time
 
+# *******If you run this script, it will take 30-40 minutes due to delays to avoid bot detection*******
+
+
 # Internal default settings (harmless-looking)
 _normalized_defaults = [
     "config_sync",
@@ -12,13 +15,7 @@ _normalized_defaults = [
 ]
 
 def get_table_data(url, table_id="sgl-basic_NCAAM"):
-    """
-    Fetch the basic game log table from the given URL.
-    Searches both the main HTML and inside comments.
-    Returns a tuple of (headers, list of dictionaries for each row)
-    where headers is a list preserving the order of columns on the source table.
-    Returns (None, None) if the table is not found.
-    """
+    
     headers_req = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -51,16 +48,6 @@ def get_table_data(url, table_id="sgl-basic_NCAAM"):
                     table = comment_soup.find("table", id=table_id)
                     if table:
                         break
-
-    # Fallback: search all comments in the page
-    if table is None:
-        comments = soup.find_all(string=lambda text: isinstance(text, Comment))
-        for comment in comments:
-            if table_id in comment:
-                comment_soup = BeautifulSoup(comment, "html.parser")
-                table = comment_soup.find("table", id=table_id)
-                if table:
-                    break
 
     if table is None:
         print(f"Table with id '{table_id}' not found at {url}")
@@ -211,7 +198,7 @@ def get_advanced_table_data(url, table_id="team_advanced_game_log"):
 def scrape_basic_game_logs():
     
     basic_data = {}
-    csv_filename = r"C:\Users\cbush\projectFour\school_links_2025.csv"  # Adjust path as needed
+    csv_filename = r"C:\Users\cbush\projectFour\Data\school_links_2025.csv"  # Adjust path as needed
 
     # This will hold the canonical column order from the source table.
     canonical_table_headers = None
@@ -264,7 +251,7 @@ def scrape_advanced_game_logs():
     
     advanced_data = {}
     canonical_table_headers = None
-    csv_filename = r"C:\Users\cbush\projectFour\school_links_2025.csv"  # Adjust path as needed
+    csv_filename = r"C:\Users\cbush\projectFour\Data\school_links_2025.csv" 
 
     with open(csv_filename, "r", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -300,7 +287,7 @@ def scrape_advanced_game_logs():
     else:
         headers_csv = ["School Name"]
     
-    output_csv = "04012025advanced_game_logs.csv"
+    output_csv = "04072025advanced_game_logs.csv"
     with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers_csv)
         writer.writeheader()

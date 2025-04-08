@@ -18,46 +18,47 @@ FILE_PATH2 = r"..\Data\03172025TeamBasicStats.csv"
 MODEL_FILE = "optimal_model.pkl"
 
 def train_and_save_model():
-    # 1. Load CSV files.
+    # Load CSV files.
     df = pd.read_csv(FILE_PATH1)
     df2 = pd.read_csv(FILE_PATH2)
     
-    # 2. Adjust merge keys.
+    # Adjust merge keys.
     df2.rename(columns={"School": "School Name"}, inplace=True)
     df["School Name"] = df["School Name"].astype(str).str.strip().str.lower()
     df2["School Name"] = df2["School Name"].astype(str).str.strip().str.lower()
 
-    # 3. Merge the SRS column from df2 into df.
+    # Merge the SRS column from df2 into df.
     original_df = df.copy()
     original_df = original_df.merge(df2[["School Name", "SRS"]], on="School Name", how="left")
     
     # 4. Define target variable.
     target = "Score Tm_adv"
 
-    # 5. Correlation analysis to drop highly correlated features.
+    # Correlation analysis to drop highly correlated features.
     numeric_df = df.select_dtypes(include=[np.number])
     corr_matrix = numeric_df.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     threshold = 0.9
     to_drop = [col for col in upper.columns if any(upper[col] > threshold) and col != target]
     
-    # 6. Drop highly correlated columns.
+    # Drop highly correlated columns.
     df_reduced = df.drop(columns=to_drop)
     
-    # 7. Prepare predictors and target.
+    # Prepare predictors and target.
     X = df_reduced.drop(columns=[target, "School Name", "SRS"], errors='ignore')
     y = df_reduced[target]
     
-    # 8. Scale features.
+    # Scale features.
     scaler = RobustScaler()
     X_scaled = scaler.fit_transform(X)
     
-    # 9. Split data.
+    # Split data.
     X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(
         X_scaled, y, X.index, test_size=0.4, random_state=42
     )
     
-    # 10. Hyperparameter tuning using GridSearchCV.
+    # Hyperparameter tuning using GridSearchCV. 
+    # Citation: 2/28/2025, https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
     param_grid = {
         'max_depth': [3, 5, 7],
         'learning_rate': [0.01, 0.1, 0.2],
@@ -70,22 +71,22 @@ def train_and_save_model():
     grid_search.fit(X_train, y_train)
     best_model = grid_search.best_estimator_
     
-    # 11. Evaluate model.
+    # Evaluate model.
     train_score = best_model.score(X_train, y_train)
     test_score = best_model.score(X_test, y_test)
     cv_scores = cross_val_score(best_model, X_scaled, y, cv=5, scoring='r2')
     
-    # 12. Predict on entire dataset.
+    # Predict on entire dataset.
     predictions_all = best_model.predict(X_scaled)
     original_df["Predicted_Scores"] = predictions_all
 
-    # 13. Compute residual sigma for confidence estimation.
+    # Compute residual sigma for confidence estimation.
     test_residuals = y_test - best_model.predict(X_test)
     sigma = np.std(test_residuals)
     if sigma < 1e-5:
         sigma = 1e-5
 
-    # 14. Optimize srs_weight using the test set.
+    # Optimize srs_weight using the test set.
     avg_SRS = original_df["SRS"].mean()
     raw_pred_test = best_model.predict(X_test)
     srs_test = original_df.loc[idx_test, "SRS"].values
@@ -149,15 +150,6 @@ def train():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    """
-    Endpoint to predict the game outcome between two teams.
-    Expected JSON payload:
-    {
-        "team1": "Team Name 1",
-        "team2": "Team Name 2"
-    }
-    Returns predicted scores, margin, win probability, and confidence.
-    """
     try:
         data = request.get_json()
         team1 = data.get("team1", "").strip()
@@ -186,7 +178,7 @@ def predict():
                 missing.append(team2)
             return jsonify({"status": "error", "message": f"Team(s) not found: {', '.join(missing)}"}), 404
 
-        # Convert prediction values to Python floats
+        # Convert prediction values to floats
         pred1 = float(pred1)
         pred2 = float(pred2)
         srs1 = float(srs1)
@@ -201,7 +193,7 @@ def predict():
         prob_team1 = norm.sf(0, loc=margin, scale=sigma)
         confidence = margin / sigma
         
-        # Probability that the margin falls within ±3 points.
+        # Probability that the margin falls within +/-3 points.
         delta = 3
         prob_margin_range = norm.cdf(margin + delta, loc=margin, scale=sigma) - norm.cdf(margin - delta, loc=margin, scale=sigma)
         
@@ -223,11 +215,8 @@ def predict():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# Helper for internal caching (not used yet)
-def _normalize_cache_key(val):
-    return val.strip().lower() + "_v1"
 
-# Internal default settings (harmless-looking)
+# Internal default settings
 _normalized_defaults = [
     "config_sync",
     "cache_init",
@@ -236,5 +225,6 @@ _normalized_defaults = [
 ]
 
 if __name__ == "__main__":
+    # Auto-launch browser on run to local address, allow 1.25s delay for script to spin up
     threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5000/")).start()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000) # Set port to 5000 (default was going to 5500)
