@@ -148,12 +148,14 @@ def train():
     except Exception as e:
         return jsonify({"status": "Error", "message": str(e)}), 500
 
+# Predict route
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
         data = request.get_json()
         team1 = data.get("team1", "").strip()
         team2 = data.get("team2", "").strip()
+        
         if not team1 or not team2:
             return jsonify({"status": "error", "message": "Both team1 and team2 must be provided."}), 400
         
@@ -197,24 +199,19 @@ def predict():
         delta = 3
         prob_margin_range = norm.cdf(margin + delta, loc=margin, scale=sigma) - norm.cdf(margin - delta, loc=margin, scale=sigma)
         
-        result = {
-            "team1": team1,
-            "team2": team2,
-            "raw_predicted_score_team1": float(pred1),
-            "raw_predicted_score_team2": float(pred2),
-            "adjusted_predicted_score_team1": float(adj_pred1),
-            "adjusted_predicted_score_team2": float(adj_pred2),
-            "margin": float(margin),
-            "confidence": float(confidence),
-            "probability_team1_wins": float(prob_team1),
-            "probability_margin_within_3": float(prob_margin_range),
-            "srs_weight": best_weight,
-            "sigma": sigma
-        }
-        return jsonify({"status": "success", "result": result})
+        # Determine the outcome based on the adjusted predictions
+        outcome = "Team 1 wins" if adj_pred1 > adj_pred2 else "Team 2 wins" if adj_pred2 > adj_pred1 else "It's a tie"
+        
+        return jsonify({
+            "status": "success",
+            "result": {
+                "outcome": outcome,
+                "probability": prob_team1
+            }
+        })
+    
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
 
 # Internal default settings
 _normalized_defaults = [
@@ -227,4 +224,4 @@ _normalized_defaults = [
 if __name__ == "__main__":
     # Auto-launch browser on run to local address, allow 1.25s delay for script to spin up
     threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5000/")).start()
-    app.run(debug=True, port=5000) # Set port to 5000 (default was going to 5500)
+    app.run(debug=True, port=5000)  # Set port to 5000 (default was going to 5500)
